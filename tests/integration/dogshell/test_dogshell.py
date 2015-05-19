@@ -1,3 +1,4 @@
+# stdlib
 import json
 import os
 import random
@@ -8,6 +9,10 @@ import time
 import tempfile
 import unittest
 
+# 3p
+from nose.plugins.attrib import attr
+
+# datadog
 from hashlib import md5
 from datadog.dogshell.common import find_localhost
 from datadog.util.compat import is_p3k, ConfigParser
@@ -33,8 +38,8 @@ class TestDogshell(unittest.TestCase):
         self.config_fn, self.config_file = get_temp_file()
         config = ConfigParser()
         config.add_section('Connection')
-        config.set('Connection', 'api_key', os.environ['DATADOG_API_KEY'])
-        config.set('Connection', 'app_key', os.environ['DATADOG_APP_KEY'])
+        config.set('Connection', 'apikey', os.environ['DATADOG_API_KEY'])
+        config.set('Connection', 'appkey', os.environ['DATADOG_APP_KEY'])
         config.set('Connection', 'api_host', os.environ['DATADOG_HOST'])
         config.write(self.config_file)
         self.config_file.flush()
@@ -342,7 +347,7 @@ class TestDogshell(unittest.TestCase):
         self.assertNotEquals(return_code, 0)
 
     # Test monitors
-
+    @attr("monitor")
     def test_monitors(self):
         # Create a monitor
         query = "avg(last_1h):sum:system.net.bytes_rcvd{host:host0} > 100"
@@ -379,6 +384,17 @@ class TestDogshell(unittest.TestCase):
         self.assertEquals(out['options']['notify_no_data'], options["notify_no_data"])
         self.assertEquals(out['options']['no_data_timeframe'], options["no_data_timeframe"])
 
+    @attr("test")
+    def test_host_muting(self):
+        # Create a monitor
+        query = "avg(last_1h):sum:system.net.bytes_rcvd{host:host0} > 100"
+        type_alert = "metric alert"
+        out, err, return_code = self.dogshell(["monitor", "post", type_alert, query])
+
+        assert "id" in out, out
+        out = json.loads(out)
+        monitor_id = str(out["id"])
+
         # Mute monitor
         out, err, return_code = self.dogshell(["monitor", "mute", str(out["id"])])
         assert "id" in out, out
@@ -409,9 +425,6 @@ class TestDogshell(unittest.TestCase):
         # Retry unmuting all -> should raise an error this time
         out, err, return_code = self.dogshell(["monitor", "unmute_all"], check_return_code=False)
         self.assertNotEquals(return_code, 0)
-
-    def test_host_muting(self):
-        pass
 
     def test_downtime_schedule(self):
         # Schedule a downtime
