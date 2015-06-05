@@ -124,6 +124,14 @@ class HTTPClient(object):
                 if e.response.status_code == 404 or e.response.status_code == 400:
                     pass
                 else:
+                    if e.response.text:
+                        try:
+                            error_msg = json.loads(e.response.text).get('errors')
+                            if error_msg:
+                                raise requests.exceptions.HTTPError("{0} ({1})".format(
+                                        e.message, error_msg[0]))
+                        except json.JSONDecodeError:
+                            pass
                     raise
             except TypeError as e:
                 raise TypeError(
