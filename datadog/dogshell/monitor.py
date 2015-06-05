@@ -46,10 +46,10 @@ class MonitorClient(object):
         delete_parser.add_argument('monitor_id', help="monitor to delete")
         delete_parser.set_defaults(func=cls._delete)
 
-        mute_all_parser = verb_parsers.add_parser('mute_all', help="Mute all monitors")
+        mute_all_parser = verb_parsers.add_parser('mute_all', help="Globally mute monitors (downtime over *)")
         mute_all_parser.set_defaults(func=cls._mute_all)
 
-        unmute_all_parser = verb_parsers.add_parser('unmute_all', help="Unmute all monitors")
+        unmute_all_parser = verb_parsers.add_parser('unmute_all', help="Globally unmute monitors (cancel downtime over *)")
         unmute_all_parser.set_defaults(func=cls._unmute_all)
 
         mute_parser = verb_parsers.add_parser('mute', help="Mute a monitor")
