@@ -743,7 +743,7 @@ class TestDatadog(unittest.TestCase):
         eq(mute['action'], "Muted")
         eq(mute['end'], end2)
 
-        unmute = dog.Host.unmute(hostname)
+        dog.Host.unmute(hostname)
 
 if __name__ == '__main__':
     unittest.main()

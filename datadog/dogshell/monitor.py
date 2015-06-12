@@ -46,10 +46,12 @@ class MonitorClient(object):
         delete_parser.add_argument('monitor_id', help="monitor to delete")
         delete_parser.set_defaults(func=cls._delete)
 
-        mute_all_parser = verb_parsers.add_parser('mute_all', help="Globally mute monitors (downtime over *)")
+        mute_all_parser = verb_parsers.add_parser('mute_all', help="Globally mute "
+                                                  "monitors (downtime over *)")
         mute_all_parser.set_defaults(func=cls._mute_all)
 
-        unmute_all_parser = verb_parsers.add_parser('unmute_all', help="Globally unmute monitors (cancel downtime over *)")
+        unmute_all_parser = verb_parsers.add_parser('unmute_all', help="Globally unmute "
+                                                    "monitors (cancel downtime over *)")
         unmute_all_parser.set_defaults(func=cls._unmute_all)
 
         mute_parser = verb_parsers.add_parser('mute', help="Mute a monitor")
@@ -196,8 +198,7 @@ class MonitorClient(object):
     @classmethod
     def _unmute(cls, args):
         api._timeout = args.timeout
-        res = api.Monitor.unmute(args.monitor_id, scope=args.scope,
-                                all_scopes=args.all_scopes)
+        res = api.Monitor.unmute(args.monitor_id, scope=args.scope, all_scopes=args.all_scopes)
         report_warnings(res)
         report_errors(res)
         if format == 'pretty':

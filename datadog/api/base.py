@@ -129,7 +129,7 @@ class HTTPClient(object):
                             error_msg = json.loads(e.response.text).get('errors')
                             if error_msg:
                                 raise requests.exceptions.HTTPError("{0} ({1})".format(
-                                        e.message, error_msg[0]))
+                                                                    e.message, error_msg[0]))
                         except json.JSONDecodeError:
                             pass
                     raise
