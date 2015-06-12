@@ -1,6 +1,7 @@
 # python
 import datetime
 import os
+from requests.exceptions import HTTPError
 import time
 import unittest
 
@@ -356,10 +357,8 @@ class TestDatadog(unittest.TestCase):
         dog.Metric.send(metric="test.metric", points=1.0)
         dog.Metric.send(metric="test.metric", points=(time.time(), 1.0))
 
+    @attr('monitor')
     def test_monitors(self):
-        # Stop testing 'silenced' parameter
-        # Depending on the enabled flag (i.e. API release), 'silenced' can be a boolean or a dictionnary
-
         query = "avg(last_1h):sum:system.net.bytes_rcvd{host:host0} > 100"
 
         monitor_id = dog.Monitor.create(query=query, type="metric alert")['id']
@@ -370,13 +369,15 @@ class TestDatadog(unittest.TestCase):
 
         options = {
             "notify_no_data": True,
-            "no_data_timeframe": 20
+            "no_data_timeframe": 20,
+            "silenced": {"*": None}
         }
-        dog.Monitor.update(monitor_id, query=query, silenced=True, options=options, timeout_h=1)
+        dog.Monitor.update(monitor_id, query=query, options=options, timeout_h=1)
         monitor = dog.Monitor.get(monitor_id)
         assert monitor['query'] == query, monitor['query']
         assert monitor['options']['notify_no_data'] == True, monitor['options']['notify_no_data']
-        assert monitor['options']['no_data_timeframe'] == 20, monitor['options']['notify_no_data']
+        assert monitor['options']['no_data_timeframe'] == 20, monitor['options']['no_data_timeframe']
+        assert monitor['options']['silenced'] == {"*": None}, monitor['options']['silenced']
 
         dog.Monitor.delete(monitor_id)
         try:
@@ -652,7 +653,7 @@ class TestDatadog(unittest.TestCase):
         eq(dt, None)  # No response is expected.
 
         # We shouldn't be able to mute a simple alert on a scope.
-        assert_raises(ApiError, dog.Monitor.mute, monitor_id, scope='env:staging')
+        assert_raises(HTTPError, dog.Monitor.mute, monitor_id, scope='env:staging')
 
         query2 = "avg(last_1h):sum:system.net.bytes_rcvd{*} by {host} > 100"
         monitor_id = dog.Monitor.create(type='metric alert', query=query2)['id']
@@ -664,6 +665,17 @@ class TestDatadog(unittest.TestCase):
         eq(monitor['options']['silenced'], {'host:foo': None})
 
         dog.Monitor.unmute(monitor_id, scope='host:foo')
+        monitor = dog.Monitor.get(monitor_id)
+        eq(monitor['options']['silenced'], {})
+
+        options = {
+            "silenced": {"host:abcd1234": None, "host:abcd1235": None}
+        }
+        dog.Monitor.update(monitor_id, query=query, options=options)
+        monitor = dog.Monitor.get(monitor_id)
+        eq(monitor['options']['silenced'], options['silenced'])
+
+        dog.Monitor.unmute(monitor_id, all_scopes=True)
         monitor = dog.Monitor.get(monitor_id)
         eq(monitor['options']['silenced'], {})
 
