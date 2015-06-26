@@ -1,5 +1,5 @@
 from datadog.util.compat import urlparse
-from datadog.api.base import CreateableAPIResource, ActionAPIResource
+from datadog.api.base import CreateableAPIResource, ActionAPIResource, GetableAPIResource, ListableAPIResource
 
 
 class Graph(CreateableAPIResource, ActionAPIResource):
@@ -45,3 +45,82 @@ class Graph(CreateableAPIResource, ActionAPIResource):
         snapshot_status_url = '/graph/snapshot_status/{0}'.format(snap_path)
 
         return super(Graph, cls)._trigger_action('GET', snapshot_status_url)
+
+
+class Embed(ListableAPIResource, GetableAPIResource, ActionAPIResource):
+    """
+    A wrapper around Embed HTTP API.
+    """
+    _class_url = '/graph/embed'
+
+    @classmethod
+    def get_all(cls):
+        """
+        Returns a JSON object containing a list of all embeddable graphs
+        in the API user's organization.
+
+        :returns: JSON response from HTTP API request
+        """
+        return super(Embed, cls).get_all()
+
+    @classmethod
+    def get(cls, embed_id, **params):
+        """
+        Returns a JSON object representing the specified embed.
+
+        :param embed_id:
+        :type embed_id:
+
+        :returns: JSON response from HTTP API request
+        """
+        return super(Embed, cls).get(embed_id, **params)
+
+    @classmethod
+    def create(cls, **params):
+        """
+        Returns a JSON object representing the specified embed.
+
+        :param graph_json:
+        :type graph_json:
+
+        :param timeframe:
+        :type timeframe:
+
+        :param size:
+        :type size:
+
+        :param legend:
+        :type legend:
+
+        :param template_vars:
+        :type template_vars:
+
+        :returns: JSON response from HTTP API request
+        """
+        return super(Graph, cls)._trigger_action('POST', name=cls._class_url, **params)
+
+    @classmethod
+    def enable(cls, embed_id, **params):
+        """
+        Enable a specified embed.
+
+        :param embed_id:
+        :type embed_id:
+
+        :returns: JSON response from HTTP API request
+        """
+        handle = embed_id + "/enable"
+        return super(Embed, cls).get(handle)
+
+    @classmethod
+    def revoke(cls, embed_id):
+        """
+        Revoke a specified embed.
+
+        :param embed_id:
+        :type embed_id:
+
+        :returns: JSON response from HTTP API request
+        """
+        handle = embed_id + "/revoke"
+        return super(Embed, cls).get(handle)
