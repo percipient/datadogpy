@@ -68,8 +68,8 @@ class Embed(ListableAPIResource, GetableAPIResource, ActionAPIResource):
         """
         Returns a JSON object representing the specified embed.
 
-        :param embed_id:
-        :type embed_id:
+        :param embed_id: embed token
+        :type embed_id: string embed token
 
         :returns: JSON response from HTTP API request
         """
@@ -80,20 +80,20 @@ class Embed(ListableAPIResource, GetableAPIResource, ActionAPIResource):
         """
         Returns a JSON object representing the specified embed.
 
-        :param graph_json:
-        :type graph_json:
+        :param graph_json: graph definition
+        :type graph_json: JSON string graph definition
 
-        :param timeframe:
-        :type timeframe:
+        :param timeframe: graph timeframe
+        :type timeframe: string graph timeframe
 
-        :param size:
-        :type size:
+        :param size: graph size
+        :type size: string graph size
 
-        :param legend:
-        :type legend:
+        :param legend: legend flag
+        :type legend: string legend flag
 
-        :param template_vars:
-        :type template_vars:
+        :param template_vars: template variable values
+        :type template_vars: string values
 
         :returns: JSON response from HTTP API request
         """
@@ -104,8 +104,8 @@ class Embed(ListableAPIResource, GetableAPIResource, ActionAPIResource):
         """
         Enable a specified embed.
 
-        :param embed_id:
-        :type embed_id:
+        :param embed_id: embed token
+        :type embed_id: string embed token
 
         :returns: JSON response from HTTP API request
         """
@@ -117,8 +117,8 @@ class Embed(ListableAPIResource, GetableAPIResource, ActionAPIResource):
         """
         Revoke a specified embed.
 
-        :param embed_id:
-        :type embed_id:
+        :param embed_id: embed token
+        :type embed_id: string embed token
 
         :returns: JSON response from HTTP API request
         """
